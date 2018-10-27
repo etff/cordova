@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+        <meta name="viewport" content="initial-scale=1.0, width=device-width">
+        <link rel="stylesheet" type="text/css" href="jquery.mobile-1.4.5.min.css" />
+        <script type="text/javascript" src="jquery.js" />
+        <script type="text/javascript" src="jquery.mobile-1.4.5.min.js" />
+        <script type="text/javascript" src="cordova.js"></script>        
+    <script>
+        var getVibration = function() {
+            navigator.vibrate(1000);
+        };
+
+        var options =  {
+                maximumAge  : 300,
+                timeout     : 50000,
+                enableHighAccuracy : true    
+        };
+
+        var onSuccess = function(position) {
+            $("#resultArea").html("<p>위도 : " + position.coords.latitude + "</p>" +
+                "<p>경도 : " + position.coords.longitude + "</p>" + '\n');
+            
+            callWeather(position.coords.latitude, position.coords.longitude);
+        };
+
+        var onError = function(error) {
+            $("#resultArea").html("<p>위치정보 오류: (" + posError.code + ")" + 
+            posError.message + "</p>");
+        }
+
+        var getLocation = function() {
+            navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+        };
+
+        var callWeather = function(lat, long, callback) {
+
+            $.getJSON("http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + long + "&APPID=d13a2986e6e7bd907aff2fcc8e193ccf&units=metric&callback=?", 
+                function(data) { 
+                    $("#resultArea").append("<p>온도 : "+ data.main.temp + "도</p>");
+                    $("#resultArea").append("<p>날씨 : "+ data.weather[0].main + "</p>");
+            });
+            
+        }
+
+        $(function(){
+            
+            $("#btnVibrate").click(function(){
+                getVibration();
+            });
+            
+            $("#btnLocation").click(function(){
+                getLocation();
+            });
+        });
+    </script>
+
+</head>
+
+<body>
+    <div class="ui-header">
+        <h1 style="text-align:center">Cordova API</h1>
+    </div>
+    <div class="ui-body ui-body-a"><br />
+        <div class="ui-bar ui-bar-b">
+            <h3>단말기 제어 장치</h3>
+        </div>
+        <div id="resultArea">
+            <p></p>
+        </div>
+    </div>
+    <button class="ui-btn" id="btnVibrate">진동 시키기</button>
+    <button class="ui-btn" id="btnLocation">현재 위치 알아내기</button>
+</body>
+
+</html>
